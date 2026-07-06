@@ -1,12 +1,11 @@
 const User = require('../models/emartUser');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-
+const { verifyEmail } = require('../config/verifyEmail');
+const { tokenGenaretor } = require('../config/tokenGenaraton');
 
 exports.register = async (req, res) => {
 
     const { email, password, confirmPassword, terms } = req.body
-
     try {
         const existingUser = await User.findOne({ email: email });
 
@@ -16,8 +15,8 @@ exports.register = async (req, res) => {
                 message: 'User already existed.'
             });
         }
-
-        if (!email || !password || !confirmPassword) {
+ 
+        if (!email || !password || !confirmPassword || !terms) {
             return res.status(400).json({
                 success: false,
                 message: 'All fields are required'
@@ -48,13 +47,17 @@ exports.register = async (req, res) => {
         });
         await user.save();
 
-        // token
-        let token = jwt.sign({
-            user: user._id,
-            userMail: user.email
-        }, process.env.JWT_SECRET_KEY,
-            { expiresIn: "1d" }
+        // Genarate a token
+        let token = tokenGenaretor(
+            {
+                user: user._id,
+                user: user.email
+            }, 
+            process.env.JWT_SECRET_KEY, 
+            process.env.JWT_ACCESS_TOKEN_EXPIRY
         )
+        // Send mail Verification
+        verifyEmail(token, email);        
 
         return res.status(201).json({
             success: true,

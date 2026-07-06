@@ -25,3 +25,6 @@ let port = process.env.PORT || 5000
 app.listen(port, (req, res) => {
     console.log(`Server is running on port ${port}`);
 });
+
+
+// chmgxcnnanlamvlp // email password for app
