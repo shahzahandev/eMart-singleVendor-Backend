@@ -1,7 +1,10 @@
 const User = require('../models/emartUser');
 const bcrypt = require('bcrypt');
-const { verifyEmail } = require('../config/verifyEmail');
+const { verifyEmail, resetEmailVerification } = require('../config/verifyEmail');
 const { tokenGenaretor } = require('../config/tokenGenaraton');
+const jwt = require('jsonwebtoken');
+
+
 
 exports.register = async (req, res) => {
 
@@ -15,7 +18,7 @@ exports.register = async (req, res) => {
                 message: 'User already existed.'
             });
         }
- 
+
         if (!email || !password || !confirmPassword || !terms) {
             return res.status(400).json({
                 success: false,
@@ -52,18 +55,189 @@ exports.register = async (req, res) => {
             {
                 user: user._id,
                 user: user.email
-            }, 
-            process.env.JWT_SECRET_KEY, 
+            },
+            process.env.JWT_SECRET_KEY,
             process.env.JWT_ACCESS_TOKEN_EXPIRY
         )
         // Send mail Verification
-        verifyEmail(token, email);        
+        verifyEmail(token, email);
 
         return res.status(201).json({
             success: true,
-            message: `User created successfully`,
-            token: token
+            message: `User created successfully`
         });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+}
+
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'All fields are required'
+            });
+        }
+
+        const existingUser = await User.findOne({ email: email });
+
+        if (!existingUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'No Account found with this email address.'
+            });
+        }
+
+        let pass = bcrypt.compareSync(password, existingUser.password);
+
+        if (!pass) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid Email and Password.',
+            });
+        } else {
+            return res.status(200).json({
+                success: true,
+                message: 'Wellcome back, Login successfully.',
+                user: {
+                    userId: existingUser._id,
+                    userEmail: existingUser.email
+                }
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+}
+
+exports.forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email is required'
+            });
+        }
+
+        const user = await User.findOne({ email: email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'No Account found with this email address.'
+            });
+        }
+
+        // Genarate a token
+        let token = tokenGenaretor(
+            {
+                user: user._id,
+                user: user.email
+            },
+            process.env.JWT_SECRET_KEY,
+            process.env.JWT_ACCESS_TOKEN_EXPIRY
+        );
+
+        resetEmailVerification(token, email);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Check your email and Set Password.'
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+}
+
+exports.resetPassword = async (req, res) => {
+
+    let { newPassword, confirmPassword } = req.body;
+    let { token } = req.params;
+
+    try {
+        if (!newPassword || !confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'All fields are required.'
+            });
+        }
+
+        if (newPassword != confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: `Password don't match.`
+            })
+        }
+
+        // verify a token 
+        jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
+            if (err) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Unauthorized.'
+                });
+            } else {
+                const updatePassword = bcrypt.hashSync(newPassword, 10);
+                const updateData = User.findByIdAndUpdate({ _id: decoded.id }, { password: updatePassword });
+                console.log(updateData)
+                return res.status(200).json({
+                    success: true,
+                    message: 'Password Upadated successfully.',
+                })
+            }
+        });
+
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+}
+
+exports.resendEmailVerification = async (req, res) => {
+    let { email } = req.body;
+
+    try {
+        let user = await User.findOne({ email: email });
+
+        // Genarate a token
+        let token = tokenGenaretor(
+            {
+                user: user._id,
+                user: user.email
+            },
+            process.env.JWT_SECRET_KEY,
+            process.env.JWT_ACCESS_TOKEN_EXPIRY
+        )
+
+        verifyEmail(token, email);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Verify your email.'
+        })
 
     } catch (error) {
         return res.status(500).json({
