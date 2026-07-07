@@ -156,7 +156,8 @@ exports.forgotPassword = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: 'Check your email and Set Password.'
+            message: 'Check your email and Set Password.',
+            user
         })
 
     } catch (error) {
@@ -189,19 +190,23 @@ exports.resetPassword = async (req, res) => {
         }
 
         // verify a token 
-        jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
+        jwt.verify(token, process.env.JWT_SECRET_KEY, async function (err, decoded) {
             if (err) {
                 return res.status(400).json({
                     success: false,
                     message: 'Unauthorized.'
                 });
             } else {
-                const updatePassword = bcrypt.hashSync(newPassword, 10);
-                const updateData = User.findByIdAndUpdate({ _id: decoded.id }, { password: updatePassword });
-                console.log(updateData)
+                console.log(decoded.data.user)
+
+                const hash = bcrypt.hashSync(newPassword, 10);
+
+                const user = await User.findOne({email: decoded.data.user})
+                user.password = hash
+                await user.save()
                 return res.status(200).json({
                     success: true,
-                    message: 'Password Upadated successfully.',
+                    message: 'Password Upadated successfully.'
                 })
             }
         });

@@ -5,7 +5,7 @@ const {register, login, forgotPassword, resetPassword, resendEmailVerification} 
 router.post('/register', register);  // checked
 router.post('/login', login); // checked
 router.post('/forgotPassword', forgotPassword); // checked
-router.post('/resetPassword/:token', resetPassword);  // password update hoi, but database save hoi na....
+router.post('/resetPassword/:token', resetPassword);  // checked
 router.post('/resendEmailVerification', resendEmailVerification); // NO check
 
 
