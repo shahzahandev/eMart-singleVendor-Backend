@@ -201,7 +201,7 @@ exports.resetPassword = async (req, res) => {
 
                 const hash = bcrypt.hashSync(newPassword, 10);
 
-                const user = await User.findOne({email: decoded.data.user})
+                const user = await User.findOne({ email: decoded.data.user })
                 user.password = hash
                 await user.save()
                 return res.status(200).json({
@@ -227,6 +227,19 @@ exports.resendEmailVerification = async (req, res) => {
     try {
         let user = await User.findOne({ email: email });
 
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email is required.'
+            });
+        }
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'No account found with this email address.'
+            });
+        }
         // Genarate a token
         let token = tokenGenaretor(
             {
@@ -242,8 +255,50 @@ exports.resendEmailVerification = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: 'Verify your email.'
-        })
+        });
 
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+}
+
+exports.verifyEmailCheck = async (req, res) => {
+    let { token } = req.params;
+
+    try {
+
+        // verify a token 
+        jwt.verify(token, process.env.JWT_SECRET_KEY, async function (err, decoded) {
+            if (err) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Unauthorized.'
+                });
+            } else {
+                const userId = decoded.data.user;
+                const user = await User.findOne({email : userId});
+
+                if (user.isVerified) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Email already verified.'
+                    });
+                } else {
+                    user.isVerified = true
+                    await user.save();
+
+                    return res.status(200).json({
+                        success: true,
+                        message: 'Email verified successfully.',
+                        user
+                    });
+                }
+            }
+        });
     } catch (error) {
         return res.status(500).json({
             success: false,
