@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 
 const dbConnetion = require('./utils/dbConnection');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 // middleware
 app.use(express.json());
@@ -16,7 +17,8 @@ app.use(cookieParser());
 dbConnetion();
 
 // Routes
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth', authRoutes); // Auth-Routes
+app.use('/api/v1/user', userRoutes);  // User-Routes
 
 
 
@@ -25,6 +27,5 @@ let port = process.env.PORT || 5000
 app.listen(port, (req, res) => {
     console.log(`Server is running on port ${port}`);
 });
-
 
 // chmgxcnnanlamvlp // email password for app
