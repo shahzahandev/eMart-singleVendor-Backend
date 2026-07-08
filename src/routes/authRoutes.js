@@ -10,4 +10,4 @@ router.post('/resetPassword/:token', resetPassword);  // checked
 router.post('/resendEmailVerification', resendEmailVerification); // checked
 router.post('/verifyEmailCheck/:token', verifyEmailCheck); // checked 
 
-module.exports = router 
+module.exports = router; 
