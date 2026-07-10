@@ -5,9 +5,11 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
 const dbConnetion = require('./utils/dbConnection');
+
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
+const cartRoutes = require('./routes/cartRoutes');
 
 
 // middleware
@@ -22,6 +24,7 @@ dbConnetion();
 app.use('/api/v1/auth', authRoutes); // Auth-Routes
 app.use('/api/v1/user', userRoutes);  // User-Routes
 app.use('/api/v1/product', productRoutes); // Product-Routes
+app.use('/api/v1/cart', cartRoutes);  // Cart-Routes
 
 
 
