@@ -21,11 +21,10 @@ app.use(cookieParser());
 dbConnetion();
 
 // Routes
-app.use('/api/v1/auth', authRoutes); // Auth-Routes
-app.use('/api/v1/user', userRoutes);  // User-Routes
-app.use('/api/v1/product', productRoutes); // Product-Routes
-app.use('/api/v1/cart', cartRoutes);  // Cart-Routes
-
+app.use('/api/v1/auth', authRoutes); // Auth-Routes checked
+app.use('/api/v1/user', userRoutes);  // User-Routes checked
+app.use('/api/v1/product', productRoutes); // Product-Routes checked
+app.use('/api/v1/cart', cartRoutes);  // Cart-Routes checked
 
 
 // Port 
