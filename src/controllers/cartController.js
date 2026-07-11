@@ -22,14 +22,33 @@ exports.createCart = async (req, res) => {
             });
         }
 
-        //-----------------------------
+        if (existingProduct.stock <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Product is out of stock."
+            });
+        }
+
+        // same user and product access
         const existingProductOnCart = await Cart.findOne({ product: proid, user: userid });
 
         if (existingProductOnCart) {
             existingProductOnCart.quantity += 1
-            finalPrice = existingProduct.discountPrice > 0 ? existingProduct.discountPrice : existingProduct.discountPrice
+            finalPrice = existingProduct.discountPrice > 0 ? existingProduct.discountPrice : existingProduct.price
             existingProductOnCart.totalPrice = existingProductOnCart.quantity * finalPrice
             existingProductOnCart.save();
+
+            // stock check
+            if (existingProduct.stock <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Product is out of stock'
+                });
+            }
+
+            existingProduct.stock = existingProduct.stock - 1
+            existingProduct.save();
+
             return res.status(200).json({
                 success: true,
                 message: 'Product quantity updated successfully',
@@ -38,19 +57,22 @@ exports.createCart = async (req, res) => {
         }
 
         let priceCal = existingProduct.discountPrice ? existingProduct.discountPrice : existingProduct.price
+        
         let cart = new Cart({
+            user: userid,
             product: proid,
             quantity: 1,
-            user: userid,
             totalPrice: priceCal
         });
         await cart.save();
+        existingProduct.stock = existingProduct.stock - 1
+        existingProduct.save();
+
 
         return res.status(201).json({
             success: true,
             message: 'Cart created successfully',
-            cart,
-            existingProductOnCart
+            cart
         });
 
     } catch (error) {
@@ -79,9 +101,20 @@ exports.increDecre = async (req, res) => {
 
         // access product on cart
         const product = await Product.findById(cart.product);
+
+          if (product.stock <= 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Product is out of stock.'
+                })
+            }
+        
         // increment and decrement process
         if (type == 'plus') {
             cart.quantity += 1;
+            product.stock = product.stock - 1
+            await product.save();
+
         } else if (type == 'minus') {
             if (cart.quantity <= 1) {
                 return res.status(400).json({
@@ -90,6 +123,9 @@ exports.increDecre = async (req, res) => {
                 });
             }
             cart.quantity -= 1;
+            product.stock = product.stock + 1
+            await product.save();
+
         } else {
             return res.status(400).json({
                 success: false,
@@ -97,8 +133,9 @@ exports.increDecre = async (req, res) => {
             });
         }
         // total price update
-        cart.totalPrice = cart.quantity * product.price
-        await cart.save();
+        let withSumDis = product.discountPrice ? product.discountPrice : product.price
+        cart.totalPrice = cart.quantity * withSumDis
+        await cart.save();        
 
         return res.status(200).json({
             success: true,
@@ -181,7 +218,7 @@ exports.singleUserCart = async (req, res) => {
 
 exports.allCart = async (req, res) => {
     try {
-        const cart = await Cart.find({});
+        const cart = await Cart.find({}).populate('user product');
 
         return res.status(200).json({
             success: true,
