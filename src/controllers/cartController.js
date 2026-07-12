@@ -56,7 +56,7 @@ exports.createCart = async (req, res) => {
             });
         }
 
-        let priceCal = existingProduct.discountPrice ? existingProduct.discountPrice : existingProduct.price
+        let priceCal = existingProduct.discountPrice > 0 ? existingProduct.discountPrice : existingProduct.price
         
         let cart = new Cart({
             user: userid,
@@ -193,7 +193,7 @@ exports.singleUserCart = async (req, res) => {
                 message: 'Cart Not Found.'
             });
         }
-
+        
         totalPrice = 0
         cart.map(item => {
             totalPrice += item.totalPrice

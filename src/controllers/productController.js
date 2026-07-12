@@ -3,13 +3,13 @@ const mongoose = require('mongoose');
 
 
 exports.createProduct = async (req, res) => {
-    const { title, price, category } = req.body;
+    const { title, price, category, stock } = req.body;
 
     try {
-        if (!title || !price || !category) {
+        if (!title || !price || !category || !stock) {
             return res.status(400).json({
                 success: false,
-                message: 'Title, Price & Category are required.'
+                message: 'Title, Price, stock & Category are required.'
             });
         }
 

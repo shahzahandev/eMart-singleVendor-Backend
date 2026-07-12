@@ -29,8 +29,8 @@ const emartProductSchema = new Schema ({
     },
     stock:{
         type: Number,
-        min: 0,
-        default: 0
+        min: 1,
+        required:  true
     },
     brand:{
         type: String
@@ -67,5 +67,13 @@ const emartProductSchema = new Schema ({
         }
     ]
 }, {timestamps: true});
+
+// ---------------------- DiscountPrice
+emartProductSchema.pre("save", function (next) {
+    if (!this.discountPrice || this.discountPrice === 0) {
+        this.discountPrice = this.price;
+    }
+    // next();
+});
 
 module.exports = mongoose.model('EmartProduct', emartProductSchema);

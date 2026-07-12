@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 
 // middleware
@@ -22,10 +23,11 @@ app.use(cookieParser());
 dbConnetion();
 
 // Routes
-app.use('/api/v1/auth', authRoutes); // Auth-Routes checked
-app.use('/api/v1/user', userRoutes);  // User-Routes checked
-app.use('/api/v1/product', productRoutes); // Product-Routes checked
-app.use('/api/v1/cart', cartRoutes);  // Cart-Routes checked
+app.use('/api/v1/auth', authRoutes); // Auth-Routes ===> checked
+app.use('/api/v1/user', userRoutes);  // User-Routes ===> checked
+app.use('/api/v1/product', productRoutes); // Product-Routes ===> checked
+app.use('/api/v1/cart', cartRoutes);  // Cart-Routes ===> checked
+app.use('/api/v1/payment', paymentRoutes);  // Payment-Routes ===> checked
 
 
 // Port 
