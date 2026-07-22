@@ -1,3 +1,4 @@
+require('dotenv').config();
 const User = require('../models/emartUser');
 const bcrypt = require('bcrypt');
 const { verifyEmail, resetEmailVerification } = require('../config/verifyEmail');
@@ -62,14 +63,15 @@ exports.register = async (req, res) => {
         )
         // Send mail Verification
         verifyEmail(token, email);
+
+        console.log(process.env.JWT_SECRET_KEY);
         console.log(token);
         
-
+       
         return res.status(201).json({
             success: true,
             message: `User created successfully,`,
-            user: {email: user.email},
-            token
+            user: {email: user.email}
         });
 
     } catch (error) {
