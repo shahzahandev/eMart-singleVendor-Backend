@@ -62,11 +62,14 @@ exports.register = async (req, res) => {
         )
         // Send mail Verification
         verifyEmail(token, email);
+        console.log(token);
+        
 
         return res.status(201).json({
             success: true,
             message: `User created successfully,`,
-            user: {email: user.email}
+            user: {email: user.email},
+            token
         });
 
     } catch (error) {
