@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const emartUserSchema = new Schema({
+    name: {
+        type: String
+    },
     email: {
         type: String,
         required: [true, 'Email is required'],
@@ -14,9 +17,9 @@ const emartUserSchema = new Schema({
         type: String,
         required: [true, 'Password is required'],
         trim: true,
-        // minLength: 8,
+        minLength: 8,
         select: true,
-        // match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, 'Please enter a stronger password'],
+        match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, 'Please enter a stronger password'],
     },
     phoneNumber: {
         type: String,
