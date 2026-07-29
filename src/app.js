@@ -24,12 +24,12 @@ app.use('/api/v1/auth', authRoutes); // Auth-Routes ===> checked
 app.use('/api/v1/user', userRoutes);  // User-Routes ===> checked
 app.use('/api/v1/product', productRoutes); // Product-Routes ===> checked
 app.use('/api/v1/cart', cartRoutes);  // Cart-Routes ===> checked
-app.use('/api/v1/payment', paymentRoutes);  // Payment-Routes ===> checked
+app.use('/api/v1/order', paymentRoutes);  // Payment-Routes ===> checked
 
 // Port 
 let port = process.env.PORT || 5000
 app.listen(port, (req, res) => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`Server is running on port ${port}`);    
 });
 
 // chmgxcnnanlamvlp // email password for app

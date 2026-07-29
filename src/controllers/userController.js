@@ -53,9 +53,7 @@ exports.singleUser = async (req, res) => {
             return res.status(200).json({
                 success: true,
                 message: `User fetched successfully.`,
-                user: {
-                    email: user.email
-                }
+                user: user
             });
         }
 
@@ -113,7 +111,6 @@ exports.deleteUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
     const { id } = req.params;
-    const { email, phoneNumber } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({
@@ -130,7 +127,7 @@ exports.updateUser = async (req, res) => {
             });
         }
 
-        const user = await User.findByIdAndUpdate(id, { email, phoneNumber }, { new: true, runValidators: true });
+        const user = await User.findByIdAndUpdate(id, req.body, {new: true, runValidators: true });
 
         if (!user) {
             return res.status(404).json({
@@ -142,6 +139,7 @@ exports.updateUser = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: 'User information Updated successfully.',
+            user
         });
 
     } catch (error) {

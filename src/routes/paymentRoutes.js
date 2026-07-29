@@ -3,7 +3,7 @@ const { paymentController, singleOrder, allOrder } = require('../controllers/pay
 const router = express.Router();
 
 
-router.post('/payment', paymentController);  // checked
+router.post('/createOrder', paymentController);  // checked
 router.get('/singleOrder/:userId', singleOrder);  // checked
 router.get('/allOrder', allOrder);  // checked
 

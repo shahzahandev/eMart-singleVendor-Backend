@@ -21,7 +21,7 @@ const emartUserSchema = new Schema({
         select: true,
         match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, 'Please enter a stronger password'],
     },
-    phoneNumber: {
+    phone: {
         type: String,
         unique: true,
         sparse: true,
@@ -46,7 +46,20 @@ const emartUserSchema = new Schema({
         default: false
 
     },
-
+    status:{
+        type: String,
+        emum:['active', 'delete'],
+        default: 'active'
+    },
+    address:{
+        type: String
+    },
+    postalCode:{
+        type: String
+    },
+    city:{
+        type: String
+    },
     billingAddress: {
         firstName: {
             type: String
@@ -75,7 +88,7 @@ const emartUserSchema = new Schema({
         country: {
             type: String
         },
-    }
+    },
 }, {timestamps: true});
 
 module.exports = mongoose.model('EmartUser', emartUserSchema);

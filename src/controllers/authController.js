@@ -1,11 +1,8 @@
-require('dotenv').config();
 const User = require('../models/emartUser');
 const bcrypt = require('bcrypt');
 const { verifyEmail, resetEmailVerification } = require('../config/verifyEmail');
 const { tokenGenaretor } = require('../config/tokenGenaraton');
 const jwt = require('jsonwebtoken');
-
-
 
 exports.register = async (req, res) => {
 
@@ -63,10 +60,6 @@ exports.register = async (req, res) => {
         )
         // Send mail Verification
         verifyEmail(token, email);
-
-        console.log(process.env.JWT_SECRET_KEY);
-        console.log(token);
-        
        
         return res.status(201).json({
             success: true,
@@ -115,8 +108,9 @@ exports.login = async (req, res) => {
                 success: true,
                 message: 'Wellcome back, Login successfully.',
                 user: {
-                    userId: existingUser._id,
-                    userEmail: existingUser.email
+                    id: existingUser._id,
+                    name: existingUser.name,
+                    email: existingUser.email
                 }
             });
         }

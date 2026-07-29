@@ -6,8 +6,8 @@ let dbConnetion = () => {
         .then(() => {
             console.log('MongoDB connected successfully.')
         })
-        .catch(() => {
-            console.log('MongoDB connection failed.')
+        .catch((error) => {
+            console.log('MongoDB connection failed.', error.message)
         });
 }
 
