@@ -8,7 +8,7 @@ router.post('/login', login); // checked
 router.post('/forgotPassword', forgotPassword); // checked
 router.post('/resetPassword/:token', resetPassword);  // checked
 router.post('/resendEmailVerification', resendEmailVerification); // checked
-router.post('/verifyEmailCheck/:token', verifyEmailCheck); // checked 
+router.post('/verifyemail/:token', verifyEmailCheck); // checked 
 
 module.exports = router; 
 
