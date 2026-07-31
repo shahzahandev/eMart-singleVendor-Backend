@@ -139,7 +139,7 @@ exports.forgotPassword = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: 'No Account found with this email address.'
+                message: 'No Account found with this email address.',
             });
         }
 
@@ -195,10 +195,10 @@ exports.resetPassword = async (req, res) => {
             if (err) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Unauthorized.'
+                    message: 'Unauthorized.',
                 });
             } else {
-                console.log(decoded.data.user)
+                // console.log(decoded.data.user)
 
                 const hash = bcrypt.hashSync(newPassword, 10);
 
