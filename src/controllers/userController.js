@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 exports.allUser = async (req, res) => {
     try {
-        const users = await User.find({})
+        const users = await User.find({isDelete: false})
             .limit(10)
             .select("-password")
             .sort({ createdAt: -1 })
@@ -85,7 +85,7 @@ exports.deleteUser = async (req, res) => {
             });
         }
 
-        const user = await User.findByIdAndDelete(id);
+        const user = await User.findByIdAndUpdate({_id: id}, {isDelete: true});
 
         if (!user) {
             return res.status(404).json({
@@ -106,6 +106,24 @@ exports.deleteUser = async (req, res) => {
             message: 'Server Error',
             error: error.message
         });
+    }
+}
+
+exports.allDeleteUser = async (req, res ) => {
+    try {
+        const user = await User.find({isDelete: true})
+        return res.status(200).json({
+            success: true,
+            message: 'all delete user',
+            user
+        });
+    } catch (error) {
+         console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server Error',
+            error: error.message
+        });  
     }
 }
 
