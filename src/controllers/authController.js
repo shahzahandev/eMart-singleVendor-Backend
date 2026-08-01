@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
 
-    const {name, email, password, confirmPassword, terms } = req.body
+    const { name, email, password, confirmPassword, terms } = req.body
     try {
         const existingUser = await User.findOne({ email: email });
 
@@ -60,11 +60,11 @@ exports.register = async (req, res) => {
         )
         // Send mail Verification
         verifyEmail(token, email);
-       
+
         return res.status(201).json({
             success: true,
             message: `User created successfully,`,
-            user: {email: user.email}
+            user: { email: user.email }
         });
 
     } catch (error) {
@@ -95,6 +95,15 @@ exports.login = async (req, res) => {
                 message: 'No Account found with this email address.'
             });
         }
+
+        // User deleted check
+        if (existingUser.status === "delete") {
+            return res.status(403).json({
+                success: false,
+                message: "Your account has been deleted. Please contact support.",
+            });
+        }
+
 
         let pass = bcrypt.compareSync(password, existingUser.password);
 
@@ -281,7 +290,7 @@ exports.verifyEmailCheck = async (req, res) => {
                 });
             } else {
                 const userId = decoded.data.user;
-                const user = await User.findOne({email : userId});
+                const user = await User.findOne({ email: userId });
 
                 if (user.isVerified) {
                     return res.status(400).json({

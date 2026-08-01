@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 exports.allUser = async (req, res) => {
     try {
         const users = await User.find({isDelete: false})
-            .limit(10)
             .select("-password")
             .sort({ createdAt: -1 })
 
@@ -85,7 +84,7 @@ exports.deleteUser = async (req, res) => {
             });
         }
 
-        const user = await User.findByIdAndUpdate({_id: id}, {isDelete: true});
+        const user = await User.findByIdAndUpdate({_id: id}, {status: 'delete'});
 
         if (!user) {
             return res.status(404).json({
@@ -111,7 +110,7 @@ exports.deleteUser = async (req, res) => {
 
 exports.allDeleteUser = async (req, res ) => {
     try {
-        const user = await User.find({isDelete: true})
+        const user = await User.find({status: 'delete'})
         return res.status(200).json({
             success: true,
             message: 'all delete user',
@@ -129,6 +128,7 @@ exports.allDeleteUser = async (req, res ) => {
 
 exports.updateUser = async (req, res) => {
     const { id } = req.params;
+    const { name, phone, city, postalCode, address} = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({
@@ -145,7 +145,7 @@ exports.updateUser = async (req, res) => {
             });
         }
 
-        const user = await User.findByIdAndUpdate(id, req.body, {new: true, runValidators: true });
+        const user = await User.findByIdAndUpdate(id, { name, phone, city, postalCode, address }, {new: true, runValidators: true });
 
         if (!user) {
             return res.status(404).json({
