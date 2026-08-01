@@ -100,7 +100,7 @@ exports.login = async (req, res) => {
         if (existingUser.status === "delete") {
             return res.status(403).json({
                 success: false,
-                message: "Your account has been deleted. Please contact support.",
+                message: "Your account has been deleted by Vendor. Please contact support.",
             });
         }
 

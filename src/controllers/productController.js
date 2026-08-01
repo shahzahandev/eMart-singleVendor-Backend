@@ -54,7 +54,6 @@ exports.createProduct = async (req, res) => {
 exports.allProduct = async(req, res) => {
     try {
         const products = await Product.find({})
-        .limit(10)
         .sort({createdAt: -1})
 
         return res.status(200).json({
@@ -96,10 +95,7 @@ exports.singleProduct = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: 'Product fatching successfully',
-            product: {
-                title: product.title,
-                price: product.price
-            }
+            product
         });
     } catch (error) {
         console.log(error);
@@ -149,7 +145,6 @@ exports.deleteProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     const { id } = req.params;
-    const { title, price, category } = req.body;
 
     try {
         if (!id) {
@@ -159,7 +154,7 @@ exports.updateProduct = async (req, res) => {
             });
         }
 
-        const product = await Product.findByIdAndUpdate(id, { title, price, category }, { new: true, runValidators: true });
+        const product = await Product.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
 
         if (!product) {
             return res.status(404).json({
