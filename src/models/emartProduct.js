@@ -52,8 +52,8 @@ const emartProductSchema = new Schema ({
     },
     status:{
         type: String,
-        enum: ['pending', 'active', 'inactive'],
-        default: 'pending'
+        enum: ['active', 'inactive'],
+        default: 'active'
     },
     images:[
         {

@@ -53,7 +53,7 @@ exports.createProduct = async (req, res) => {
 
 exports.allProduct = async(req, res) => {
     try {
-        const products = await Product.find({})
+        const products = await Product.find({status: 'active'})
         .sort({createdAt: -1})
 
         return res.status(200).json({
@@ -118,7 +118,7 @@ exports.deleteProduct = async (req, res) => {
             });
         }
 
-        const product = await Product.findByIdAndDelete(id);
+        const product = await Product.findByIdAndUpdate({_id: id}, {status: 'inactive'});
 
         if (!product) {
             return res.status(404).json({
@@ -129,7 +129,8 @@ exports.deleteProduct = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: 'Product Deleted successfully.'
+            message: 'Product Deleted successfully.',
+            product
         })
 
 
