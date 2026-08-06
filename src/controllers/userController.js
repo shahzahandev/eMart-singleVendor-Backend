@@ -84,7 +84,7 @@ exports.deleteUser = async (req, res) => {
             });
         }
 
-        const user = await User.findByIdAndUpdate({_id: id}, {status: 'delete'});
+        const user = await User.findByIdAndUpdate({ _id: id }, { status: 'delete' });
 
         if (!user) {
             return res.status(404).json({
@@ -108,27 +108,27 @@ exports.deleteUser = async (req, res) => {
     }
 }
 
-exports.allDeleteUser = async (req, res ) => {
+exports.allDeleteUser = async (req, res) => {
     try {
-        const user = await User.find({status: 'delete'})
+        const user = await User.find({ status: 'delete' })
         return res.status(200).json({
             success: true,
             message: 'all delete user',
             user
         });
     } catch (error) {
-         console.error(error);
+        console.error(error);
         return res.status(500).json({
             success: false,
             message: 'Server Error',
             error: error.message
-        });  
+        });
     }
 }
 
 exports.updateUser = async (req, res) => {
     const { id } = req.params;
-    const { name, phone, city, postalCode, address} = req.body;
+    const { name, phone, city, postalCode, address } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({
@@ -145,7 +145,7 @@ exports.updateUser = async (req, res) => {
             });
         }
 
-        const user = await User.findByIdAndUpdate(id, { name, phone, city, postalCode, address }, {new: true, runValidators: true });
+        const user = await User.findByIdAndUpdate(id, { name, phone, city, postalCode, address }, { new: true, runValidators: true });
 
         if (!user) {
             return res.status(404).json({
@@ -165,6 +165,33 @@ exports.updateUser = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: 'Server Error',
+            error: error.message
+        });
+    }
+}
+
+
+exports.getSearchData = async (req, res) => {
+    try {
+        const { search } = req.body;
+
+        let userData = await User.find({
+            $or: [
+                { name: { $regex: search, $options: "i" } },
+                { email: { $regex: search, $options: "i" } },
+            ],
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Fetching user successfully",
+            userData
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
             error: error.message
         });
     }

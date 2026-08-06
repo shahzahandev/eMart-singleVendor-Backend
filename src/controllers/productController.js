@@ -51,10 +51,10 @@ exports.createProduct = async (req, res) => {
     }
 }
 
-exports.allProduct = async(req, res) => {
+exports.allProduct = async (req, res) => {
     try {
-        const products = await Product.find({status: 'active'})
-        .sort({createdAt: -1})
+        const products = await Product.find({})
+            .sort({ createdAt: -1 })
 
         return res.status(200).json({
             success: true,
@@ -63,12 +63,33 @@ exports.allProduct = async(req, res) => {
         });
 
     } catch (error) {
-           console.log(error);
+        console.log(error);
         return res.status(500).json({
             success: false,
             message: 'Server error',
             error: error.message
-        }); 
+        });
+    }
+}
+
+exports.allActiveProduct = async (req, res) => {
+    try {
+        const products = await Product.find({ status: 'active' })
+            .sort({ createdAt: -1 })
+
+        return res.status(200).json({
+            success: true,
+            message: 'Fetching all products successfully',
+            products
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
     }
 }
 
@@ -118,7 +139,7 @@ exports.deleteProduct = async (req, res) => {
             });
         }
 
-        const product = await Product.findByIdAndUpdate({_id: id}, {status: 'inactive'});
+        const product = await Product.findByIdAndUpdate({ _id: id }, { status: 'inactive' });
 
         if (!product) {
             return res.status(404).json({
@@ -170,6 +191,26 @@ exports.updateProduct = async (req, res) => {
             product
         });
 
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+}
+
+exports.getSearchData = async (req, res) => {
+    try {
+        let productData = await Product.find({
+            title: { $regex: req.body.title, $options: "i" }
+        });
+        return res.status(200).json({
+            success: true,
+            message: "fecthing product successfully",
+            productData
+        })
     } catch (error) {
         console.log(error);
         return res.status(500).json({
