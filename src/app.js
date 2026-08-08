@@ -4,6 +4,9 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+
+const path = require("path");
+
 const dbConnetion = require('./utils/dbConnection');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -26,6 +29,7 @@ app.use('/api/v1/product', productRoutes); // Product-Routes ===> checked
 app.use('/api/v1/cart', cartRoutes);  // Cart-Routes ===> checked
 app.use('/api/v1/order', paymentRoutes);  // Payment-Routes ===> checked
 
+app.use("/upload", express.static(path.join(__dirname, "upload")));
 // Port 
 let port = process.env.PORT || 5000
 app.listen(port, (req, res) => {

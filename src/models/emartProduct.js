@@ -1,72 +1,81 @@
 const mongoose = require('mongoose');
-const {Schema} = mongoose;
+const { Schema } = mongoose;
 
-const emartProductSchema = new Schema ({
- title:{
+const emartProductSchema = new Schema({
+    title: {
         type: String,
         unique: true,
-        required: true
+        // required: true
     },
-    description:{
+    description: {
         type: String,
     },
-    shortDescription:{
+    shortDescription: {
         type: String,
     },
-    price:{
+    discountType: {
+        type: String
+    },
+    price: {
         type: Number,
-        required: true,
+        // required: true,
     },
-    discountPrice:{
+    discountPrice: {
         type: Number,
         min: 0,
         default: 0
     },
-    sku:{
-       type: String,
-       required: true,
-       unique: true, 
+    discountStartDate: {
+        type: Date
     },
-    stock:{
+    discountEndDate: {
+        type: Date
+    },
+    sku: {
+        type: String,
+        //    required: true,
+        //    unique: true, 
+    },
+    stock: {
         type: Number,
         min: 1,
-        required:  true
+        // required:  true
     },
-    brand:{
+    brand: {
         type: String
     },
-    category:{
+    category: {
         type: String,
         required: true
     },
-    subCategory:{
+    subCategory: {
         type: String,
     },
-    tag:[
+    tag: [
         {
             type: String,
         }
     ],
-    additionalInfo:{
+    additionalInfo: {
         type: String
     },
-    status:{
+    status: {
         type: String,
-        enum: ['active', 'inactive'],
+        enum: ['pending', 'active', 'inactive'],
         default: 'active'
     },
-    images:[
+    images: [
         {
-            url:{
+            url: {
                 type: String,
-                isMain:{
-                    type: Boolean,
-                    default: false
-                },
-            }
+            },
+            isMain: {
+                type: Boolean,
+                default: false
+            },
         }
     ]
-}, {timestamps: true});
+}, { timestamps: true });
 
 // ---------------------- DiscountPrice
 emartProductSchema.pre("save", function (next) {

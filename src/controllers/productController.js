@@ -3,15 +3,80 @@ const mongoose = require('mongoose');
 
 
 exports.createProduct = async (req, res) => {
-    const { title, price, category, stock } = req.body;
+    let { title, price, category, stock, tag, discountType, discountPrice, discountStartDate, discountEndDate, isMain } = req.body;
 
     try {
+
+
         if (!title || !price || !category || !stock) {
             return res.status(400).json({
                 success: false,
                 message: 'Title, Price, stock & Category are required.'
             });
         }
+
+
+        if (stock < 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Stock must be greater then 1'
+            })
+        }
+
+        price = Number(price);
+        discountPrice = Number(discountPrice);
+
+        if (discountType === "flat") {
+            if (discountPrice >= price) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Discount amount cannot be greater than or equal to product price."
+                });
+            }
+
+            if (discountPrice < 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Discount amount cannot be negative."
+                });
+            }
+        }
+
+        // if (discountType == "percentage") {
+        //     if (discountPrice > 100 || discountPrice < 0) {
+        //         return res.status(400).json({
+        //             success: false,
+        //             message: "Percentage discount must be between 0 and 100."
+        //         });
+        //     }
+        // }
+
+        let startDate = new Date(discountStartDate).setHours(0, 0, 0, 0)
+        let endDate = new Date(discountEndDate).setHours(0, 0, 0, 0)
+        let currentDate = new Date().setHours(0, 0, 0, 0)
+
+        if (currentDate > startDate) {
+            return res.status(400).json({
+                success: false,
+                message: `Discount start date can't smaller then today date`
+            })
+        }
+
+        if (endDate < startDate) {
+            return res.status(400).json({
+                success: false,
+                message: `Discount end date can't smaller then current date`
+            })
+        }
+
+        let images = [];
+
+        req.files.map((item, index) => {
+            images.push({
+                url: `/upload/${item.filename}`,
+                isMain: isMain == index
+            });
+        })
 
         const existingProduct = await Product.findOne({ title });
 
@@ -27,6 +92,8 @@ exports.createProduct = async (req, res) => {
 
         const product = new Product({
             ...req.body,
+            images: images,
+            tag: tag.split('.'),
             sku: sku
         });
 
@@ -35,10 +102,7 @@ exports.createProduct = async (req, res) => {
         return res.status(201).json({
             success: true,
             message: 'Product Created successfully',
-            product: {
-                title: product.title,
-                status: product.status
-            }
+            product
         });
 
     } catch (error) {
@@ -80,6 +144,33 @@ exports.allActiveProduct = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: 'Fetching all products successfully',
+            products
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Server error',
+            error: error.message
+        });
+    }
+}
+
+exports.allActiveAndDiscountProduct = async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const products = await Product.find({
+            $and: [
+                { status: "active" },
+                { discountStartDate: { $lte: currentDate } },
+                { discountEndDate: { $gte: currentDate } }
+            ]
+        }).sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Fetching active and dicount products successfully',
             products
         });
 

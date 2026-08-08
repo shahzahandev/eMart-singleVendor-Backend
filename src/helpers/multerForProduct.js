@@ -1,27 +1,46 @@
 const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
-// Image upload for Create Product Controller
+const uploadDir = path.join(__dirname, '../upload');
+
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads/product')
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, uniqueSuffix) + '-' + file.orginalName
-  }
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
+    }
 });
 exports.uploadProductImg = multer({ storage: storage });
+
+// // Image upload for Create Product Controller
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, './upload')
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+//     cb(null, uniqueSuffix + '-' + file.originalname)
+//   }
+// });
+// exports.uploadProductImg = multer({ storage: storage });
 
 
 
 // Image upload for Update Product Controller
 const storageUpdateProduct = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './uploads/UpdateProduct')
+    cb(null, '../uploads')
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, uniqueSuffix) + '-' + file.orginalName
+    cb(null, uniqueSuffix + '-' + file.originalname)
   }
 });
 exports.updateProductImg = multer({ storage: storageUpdateProduct });
